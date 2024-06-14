@@ -14,7 +14,7 @@ class DataSetCampanasVerdes:
         self.campanas_verdes:list[CampanaVerde] = []
         self.cantidad:int = 0
 
-        f = open(archivo_csv)
+        f = open(archivo_csv, encoding = 'utf8')
         for c in csv.DictReader(f, delimiter=";"):
             campana:CampanaVerde = CampanaVerde(
                 c["direccion"],
@@ -24,7 +24,7 @@ class DataSetCampanasVerdes:
     	        WKTaCoordenadas(c["WKT"])
             )
             self.campanas_verdes.append(campana)
-            self.tamano += 1
+            self.cantidad += 1
         f.close()
 
     def tamano(self) -> int:
@@ -59,10 +59,11 @@ class DataSetCampanasVerdes:
         '''
         vr:dict[str,int] = {}
         for campana in self.campanas_verdes:
-            if campana.barrio in vr:
-                vr[campana.barrio] += 1
-            else:
-                vr[campana.barrio] = 1
+            if material in campana.materiales:
+                if campana.barrio in vr:
+                    vr[campana.barrio] += 1
+                else:
+                    vr[campana.barrio] = 1
         return vr
 
     def tres_campanas_cercanas(self, lat:float, lng:float) -> tuple[CampanaVerde, CampanaVerde, CampanaVerde]:
@@ -79,3 +80,4 @@ class DataSetCampanasVerdes:
     #     pass
 
 # c = DataSetCampanasVerdes("../campanas-verdes.csv")
+# print(c.cantidad_por_barrio('CartónBn'))

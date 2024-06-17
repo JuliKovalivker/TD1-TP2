@@ -8,6 +8,14 @@ def WKTaCoordenadas(WKT:str) -> tuple[float,float]:
     xs_WKT:list[str] = WKT[7:-1].split(' ')
     return (float(xs_WKT[0]), float(xs_WKT[1]))
 
+def sortTresCampanas(xs:list[CampanaVerde], coord:tuple[float,float]):
+    '''Requiere: len(xs) sea 3
+       Modifica: xs de tal manera que ordena las campanas de menor a mayor con respecto a su distancia de la coord ingresada
+       Devuelve: Nada
+    '''
+    for campana in xs:
+        pass
+
 class DataSetCampanasVerdes:
     def __init__(self, archivo_csv:str):
         ''' completar docstring '''
@@ -68,11 +76,15 @@ class DataSetCampanasVerdes:
 
     def tres_campanas_cercanas(self, lat:float, lng:float) -> tuple[CampanaVerde, CampanaVerde, CampanaVerde]:
         ''' Requiere: Nada
-            Devuelve: Las tres campanas verdes más cercanas al punto ingresado
+            Devuelve: Las tres campanas verdes más cercanas al punto ingresado.
         '''
-        mas_cercanas:list[CampanaVerde] = []
+        coord:tuple[float,float] = (lat, lng)
+        tres_mas_cercanas:list[CampanaVerde] = []
         for campana in self.campanas_verdes:
-            pass
+                tres_mas_cercanas.append(campana)
+            else:
+                for cercana in tres_mas_cercanas:
+                    
 
 
     # def exportar_por_materiales(...) -> ...:

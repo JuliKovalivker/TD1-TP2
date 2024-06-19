@@ -1,5 +1,6 @@
 import csv
 from campana_verde import CampanaVerde
+from haversine import haversine, Unit
 
 def WKTaCoordenadas(WKT:str) -> tuple[float,float]:
     '''Requiere: WKT esté en el siguiente formato, donde "lat" y "lon" representan números decimales: "POINT (lat lon)".
@@ -9,12 +10,13 @@ def WKTaCoordenadas(WKT:str) -> tuple[float,float]:
     return (float(xs_WKT[0]), float(xs_WKT[1]))
 
 def sortTresCampanas(xs:list[CampanaVerde], coord:tuple[float,float]):
-    '''Requiere: len(xs) sea 3
+    '''Requiere: len(xs) sea 3.
        Modifica: xs de tal manera que ordena las campanas de menor a mayor con respecto a su distancia de la coord ingresada
        Devuelve: Nada
     '''
-    for campana in xs:
-        pass
+    for i, campana in enumerate(xs):
+        if haversine((campana.latitud, campana.longitud), coord, unit=Unit.METERS) < haversine((xs[i-1].latitud, xs[i-1].longitud), coord, unit=Unit.METERS):
+            (xs[i], xs[i-1]) =  (xs[i-1], xs[i]) 
 
 class DataSetCampanasVerdes:
     def __init__(self, archivo_csv:str):
@@ -81,9 +83,15 @@ class DataSetCampanasVerdes:
         coord:tuple[float,float] = (lat, lng)
         tres_mas_cercanas:list[CampanaVerde] = []
         for campana in self.campanas_verdes:
+            if len(tres_mas_cercanas) < 3:
                 tres_mas_cercanas.append(campana)
+                sortTresCampanas(tres_mas_cercanas, coord)
             else:
-                for cercana in tres_mas_cercanas:
+                if haversine((campana.latitud, campana.longitud), coord, unit=Unit.METERS) < tres_mas_cercanas[2]:
+                    tres_mas_cercanas.pop()
+                    tres_mas_cercanas.append(campana)
+                    sortTresCampanas(tres_mas_cercanas, coord)
+
                     
 
 

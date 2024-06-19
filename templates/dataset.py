@@ -11,8 +11,8 @@ def WKTaCoordenadas(WKT:str) -> tuple[float,float]:
 
 def sortTresCampanas(xs:list[CampanaVerde], coord:tuple[float,float]):
     '''Requiere: len(xs) sea 3.
-       Modifica: xs de tal manera que ordena las campanas de menor a mayor con respecto a su distancia de la coord ingresada
        Devuelve: Nada
+       Modifica: xs de tal manera que ordena las campanas de menor a mayor con respecto a su distancia de la coord ingresada
     '''
     for i, campana in enumerate(xs):
         if haversine((campana.latitud, campana.longitud), coord, unit=Unit.METERS) < haversine((xs[i-1].latitud, xs[i-1].longitud), coord, unit=Unit.METERS):
@@ -92,12 +92,16 @@ class DataSetCampanasVerdes:
                     tres_mas_cercanas.append(campana)
                     sortTresCampanas(tres_mas_cercanas, coord)
 
-                    
-
-
-    # def exportar_por_materiales(...) -> ...:
-    #     ''' completar docstring '''
-    #     pass
-
-# c = DataSetCampanasVerdes("../campanas-verdes.csv")
-# print(c.cantidad_por_barrio('CartónBn'))
+    def exportar_por_materiales(self, archivo_csv:str, materiales:set[str]) -> None:
+        '''Requiere: archivo_csc termine en .csv
+           Devuelve: Nada.
+           Modifica: Si es que existe previamente un archivo bajo el nombre archivo_csv, se sobreescribe por 
+                     la cantidad de campanas verdes en las que se pueda depositar todos los materiales del 
+                     conjunto materiales según dirección y barrio.
+        '''
+        f = open(archivo_csv, mode='w', encoding='UTF-8')
+        f.write(';'.join(['DIRECCION','BARRIO']) + '\n')
+        for campana in self.campanas_verdes:
+            if materiales in campana.materiales:
+                f.write(';'.join([campana.direccion, campana.barrio])+ '\n')
+        f.close()   

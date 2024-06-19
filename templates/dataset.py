@@ -1,6 +1,5 @@
 import csv
 from campana_verde import CampanaVerde
-from haversine import haversine, Unit
 
 def WKTaCoordenadas(WKT:str) -> tuple[float,float]:
     '''Requiere: WKT esté en el siguiente formato, donde "lat" y "lon" representan números decimales: "POINT (lat lon)".
@@ -9,18 +8,26 @@ def WKTaCoordenadas(WKT:str) -> tuple[float,float]:
     xs_WKT:list[str] = WKT[7:-1].split(' ')
     return (float(xs_WKT[0]), float(xs_WKT[1]))
 
-def sortTresCampanas(xs:list[CampanaVerde], coord:tuple[float,float]):
+def sortTresCampanas(xs:list[CampanaVerde], lat: float, lng: float) -> None:
     '''Requiere: len(xs) sea 3.
-       Devuelve: Nada
-       Modifica: xs de tal manera que ordena las campanas de menor a mayor con respecto a su distancia de la coord ingresada
+       Devuelve: Nada.
+       Modifica: xs de tal manera que ordena las campanas de menor a mayor con respecto a su distancia de la coord ingresada.
     '''
-    for i, campana in enumerate(xs):
-        if haversine((campana.latitud, campana.longitud), coord, unit=Unit.METERS) < haversine((xs[i-1].latitud, xs[i-1].longitud), coord, unit=Unit.METERS):
-            (xs[i], xs[i-1]) =  (xs[i-1], xs[i]) 
+    for i in range(len(xs)):
+        if xs[i].distancia(lat, lng) < xs[i-1].distancia(lat, lng):
+            (xs[i], xs[i-1]) = (xs[i-1], xs[i]) 
+
+def estaEnSet(set1: set[CampanaVerde], set2: set[CampanaVerde]) -> bool:
+    '''Requiere: Nada.
+       Devuelve: True si todos los elementos de set1 se encuentran en set2. False si no.
+    '''
+    return len(set1 - set2) == 0
 
 class DataSetCampanasVerdes:
-    def __init__(self, archivo_csv:str):
-        ''' completar docstring '''
+    def __init__(self, archivo_csv:str) -> None:
+        ''' Requiere: archivo_csv exista y sea del tipo .csv 
+            Devuelve: Nada
+        '''
         self.campanas_verdes:list[CampanaVerde] = []
         self.cantidad:int = 0
 
@@ -77,31 +84,27 @@ class DataSetCampanasVerdes:
         return vr
 
     def tres_campanas_cercanas(self, lat:float, lng:float) -> tuple[CampanaVerde, CampanaVerde, CampanaVerde]:
-        ''' Requiere: Nada
+        ''' Requiere: Nada.
             Devuelve: Las tres campanas verdes más cercanas al punto ingresado.
         '''
-        coord:tuple[float,float] = (lat, lng)
-        tres_mas_cercanas:list[CampanaVerde] = []
-        for campana in self.campanas_verdes:
-            if len(tres_mas_cercanas) < 3:
+        tres_mas_cercanas:list[CampanaVerde] = [self.campanas_verdes[0], self.campanas_verdes[1], self.campanas_verdes[2]]
+        sortTresCampanas(tres_mas_cercanas, lat, lng)
+        for campana in self.campanas_verdes[3:]:
+            if campana.distancia(lat, lng) < tres_mas_cercanas[2].distancia(lat, lng):
+                tres_mas_cercanas.pop()
                 tres_mas_cercanas.append(campana)
-                sortTresCampanas(tres_mas_cercanas, coord)
-            else:
-                if haversine((campana.latitud, campana.longitud), coord, unit=Unit.METERS) < tres_mas_cercanas[2]:
-                    tres_mas_cercanas.pop()
-                    tres_mas_cercanas.append(campana)
-                    sortTresCampanas(tres_mas_cercanas, coord)
+                sortTresCampanas(tres_mas_cercanas, lat, lng)
 
     def exportar_por_materiales(self, archivo_csv:str, materiales:set[str]) -> None:
-        '''Requiere: archivo_csc termine en .csv
+        '''Requiere: Nada.
            Devuelve: Nada.
            Modifica: Si es que existe previamente un archivo bajo el nombre archivo_csv, se sobreescribe por 
                      la cantidad de campanas verdes en las que se pueda depositar todos los materiales del 
                      conjunto materiales según dirección y barrio.
         '''
-        f = open(archivo_csv, mode='w', encoding='UTF-8')
+        f = open(archivo_csv + ".csv", mode='w', encoding='UTF-8')
         f.write(';'.join(['DIRECCION','BARRIO']) + '\n')
         for campana in self.campanas_verdes:
-            if materiales in campana.materiales:
+            if estaEnSet(materiales, campana.materiales):
                 f.write(';'.join([campana.direccion, campana.barrio])+ '\n')
-        f.close()   
+        f.close()

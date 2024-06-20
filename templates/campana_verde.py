@@ -25,3 +25,9 @@ class CampanaVerde:
             Devuelve: La representación como string de la CampanaVerde en el siguiente formato: <dir@mater/iales@barrio>.
         '''
         return "<" + self.direccion + "@" + "/".join(self.materiales) + "@" + self.barrio + ">"
+    
+    def __eq__(self, other) -> bool:
+        ''' Requiere: Nada.
+            Devuelve: Si dos objetos CampanaVerde son iguales, comparando todos sus atributos para determinarlo.
+        '''
+        return (self.direccion == other.direccion) and (self.barrio == other.barrio) and (self.comuna == other.comuna) and (len(self.materiales - other.materiales) == 0) and (len(other.materiales - self.materiales) == 0) and (self.latitud == other.latitud) and (self.longitud == other.longitud)

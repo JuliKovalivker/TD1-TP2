@@ -5,7 +5,7 @@ from haversine import haversine, Unit
 #############################################################################################
 # Tests para el método __init__()
 class TestInit(unittest.TestCase):
-    # Crear una campana estándar
+    # Crear una campana estándar y verificar sus atributos
     def test_crear_campana(self):
         output:CampanaVerde = CampanaVerde("AGUIRRE 1447","CHACARITA", 15, {"PAPEL", "CARTON"}, (-58.4, -34.5))
         self.assertEqual(output.direccion, "AGUIRRE 1447")
@@ -80,5 +80,7 @@ class TestRepr(unittest.TestCase):
         possible_output2:str = "<D@CARTON/PAPEL@B>"
         error_message:str = output + " no es igual a " + possible_output1 + " o " + possible_output2
         self.assertTrue((output == possible_output1) or (output == possible_output2), error_message)
+
+#############################################################################################
 
 unittest.main()

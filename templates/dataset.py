@@ -3,9 +3,9 @@ from campana_verde import CampanaVerde
 
 def WKTaCoordenadas(WKT:str) -> tuple[float,float]:
     '''Requiere: WKT esté en el siguiente formato, donde "lat" y "lon" representan números decimales: "POINT (lat lon)".
-       Devuelve: "lat" y "lon" convertidos a float en una tupla, en ese órden.
+       Devuelve: "lat" y "lon" convertidos a float, en una tupla, en ese órden.
     '''
-    xs_WKT:list[str] = WKT[7:-1].split(' ')
+    xs_WKT:list[str] = WKT[7:-1].split(' ') # -> Esta línea lo convierte al siguiente formáto: ["lat", "lon"]
     return (float(xs_WKT[0]), float(xs_WKT[1]))
 
 def sortTresCampanas(xs:list[CampanaVerde], lat: float, lng: float) -> None:

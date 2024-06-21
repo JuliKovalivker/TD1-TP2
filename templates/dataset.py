@@ -15,7 +15,7 @@ def sortTresCampanas(xs:list[CampanaVerde], lat: float, lng: float) -> None:
     '''
     for i in range(len(xs)):
         if xs[i].distancia(lat, lng) < xs[i-1].distancia(lat, lng):
-            (xs[i], xs[i-1]) = (xs[i-1], xs[i]) 
+            (xs[i], xs[i-1]) = (xs[i-1], xs[i])
 
 def estaEnSet(set1: set[CampanaVerde], set2: set[CampanaVerde]) -> bool:
     '''Requiere: Nada.
@@ -25,8 +25,11 @@ def estaEnSet(set1: set[CampanaVerde], set2: set[CampanaVerde]) -> bool:
 
 class DataSetCampanasVerdes:
     def __init__(self, archivo_csv:str) -> None:
-        ''' Requiere: archivo_csv exista y sea del tipo .csv 
-            Devuelve: Nada
+        ''' Requiere: archivo_csv exista y sea del tipo .csv.
+                      Debe contar con las siguientes columnas: WKT;direccion;barrio;comuna;materiales
+                      Los datos en la columna WKT deben estar en el siguiente formato, donde "lat" y "lon" representan números decimales: "POINT (lat lon)".
+                      Los datos en la columna materiales deben estar en el siguiente formato, donde "mat1" y "mat2" representan texto plano: "mat1 / mat2"
+            Devuelve: Nada.
         '''
         self.campanas_verdes:list[CampanaVerde] = []
         self.cantidad:int = 0
@@ -45,13 +48,13 @@ class DataSetCampanasVerdes:
         f.close()
 
     def tamano(self) -> int:
-        ''' Requiere: Nada
+        ''' Requiere: Nada.
             Devuelve: La cantidad de campanas verdes en el dataset d.
         '''
         return self.cantidad
 
     def barrios(self) -> set[str]:
-        ''' Requiere: Nada
+        ''' Requiere: Nada.
             Devuelve: El conjunto de todos los barrios existentes en el dataset d.
         '''
         barrios:set[str] = set()
@@ -60,10 +63,9 @@ class DataSetCampanasVerdes:
         return barrios 
 
     def campanas_del_barrio(self, barrio:str) -> list[CampanaVerde]:
-        ''' Requiere: El nombre del barrio no tenga tilde
+        ''' Requiere: El nombre del barrio esté en el mismo formato que en el archivo .csv ingresado.
             Devuelve: Las instancias de CampanaVerde del dataset correspondientes al barrio indicado.
         '''
-        barrio = barrio.upper()
         campanas_barrio:list[CampanaVerde] = []
         for campana in self.campanas_verdes:
             if campana.barrio == barrio:
@@ -71,7 +73,7 @@ class DataSetCampanasVerdes:
         return campanas_barrio
 
     def cantidad_por_barrio(self, material:str) -> dict[str, int]:
-        ''' Requiere: La primera letra en mayúscula, y se usen tildes.
+        ''' Requiere: El nombre del material esté en el mismo formato que en el archivo .csv ingresado.
             Devuelve: La cantidad de campanas verdes en cada barrio en las que se puede depositar el material indicado.
         '''
         vr:dict[str,int] = {}
@@ -84,7 +86,7 @@ class DataSetCampanasVerdes:
         return vr
 
     def tres_campanas_cercanas(self, lat:float, lng:float) -> tuple[CampanaVerde, CampanaVerde, CampanaVerde]:
-        ''' Requiere: Nada.
+        ''' Requiere: self.tamano() >= 3.
             Devuelve: Las tres campanas verdes más cercanas al punto ingresado.
         '''
         tres_mas_cercanas:list[CampanaVerde] = [self.campanas_verdes[0], self.campanas_verdes[1], self.campanas_verdes[2]]
@@ -94,6 +96,7 @@ class DataSetCampanasVerdes:
                 tres_mas_cercanas.pop()
                 tres_mas_cercanas.append(campana)
                 sortTresCampanas(tres_mas_cercanas, lat, lng)
+        return tuple(tres_mas_cercanas)
 
     def exportar_por_materiales(self, archivo_csv:str, materiales:set[str]) -> None:
         '''Requiere: Nada.

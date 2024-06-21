@@ -1,0 +1,5 @@
+WKT;direccion;barrio;comuna;materiales;mas_info
+POINT (1.0 1.0);DIR;CHACARITA;1;Papel / Cartón;Los materiales deben estar limpios y secos
+POINT (1.0 1.0);DIR;CHACARITA;1;Papel / Ladrillo;Los materiales deben estar limpios y secos
+POINT (1.0 1.0);DIR;BOEDO;1;Papel / Cartón;Los materiales deben estar limpios y secos
+POINT (1.0 1.0);DIR;BOEDO;1;Papel / Ladrillo;Los materiales deben estar limpios y secos

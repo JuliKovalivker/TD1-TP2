@@ -1,4 +1,5 @@
 import unittest
+import csv
 from dataset import DataSetCampanasVerdes
 from campana_verde import CampanaVerde
 
@@ -25,8 +26,7 @@ class TestInit(unittest.TestCase):
     def test_varias_campanas(self):
         dataset:DataSetCampanasVerdes = DataSetCampanasVerdes("./dataset_test_files/varias_campanas_iguales.csv")
         output:list[CampanaVerde] = dataset.campanas_verdes
-
-        expected_campana = CampanaVerde("DIR","BAR",1,{"Papel"}, (1.0, 1.0))
+        expected_campana:CampanaVerde = CampanaVerde("DIR","BAR",1,{"Papel"}, (1.0, 1.0))
         expected_output:list[CampanaVerde] = [expected_campana, expected_campana, expected_campana]
         self.assertEqual(output, expected_output)
 
@@ -158,10 +158,53 @@ class TestCantidadPorBarrio(unittest.TestCase):
 # Tests para el método tres_campanas_cercanas()
 class TestTresCampanasCercanas(unittest.TestCase):
     
-    # Las tres campanas más cercanas de un dataset vacío
-    def test_vacio(self):
+    # Las tres campanas más cercanas de un dataset con solo 3 campanas
+    def test_tres_campanas(self):
         dataset:DataSetCampanasVerdes = DataSetCampanasVerdes("./dataset_test_files/varias_campanas_iguales.csv")
         output:tuple[CampanaVerde, CampanaVerde, CampanaVerde] = dataset.tres_campanas_cercanas(0.0,0.0)
-        print(output)
+        expected_campana:CampanaVerde = CampanaVerde("DIR","BAR",1,{"Papel"}, (1.0, 1.0))
+        expected_output:tuple[CampanaVerde, CampanaVerde, CampanaVerde] = (expected_campana, expected_campana, expected_campana)
+        self.assertEqual(output, expected_output)
+
+    # Tres CampanaVerdes en un mismo punto, y una en otro más cerca.
+    def test_una_mas_cerca(self):
+        dataset:DataSetCampanasVerdes = DataSetCampanasVerdes("./dataset_test_files/distancia_una_mas_cerca.csv")
+        output:tuple[CampanaVerde, CampanaVerde, CampanaVerde] = dataset.tres_campanas_cercanas(0.0,0.0)
+        expected_closest:CampanaVerde = CampanaVerde("DIR","BAR",1,{"Papel"}, (0.5, 0.5)) # La campana más cercana
+        self.assertIn(expected_closest, output)
+
+    # Varias CampanasVerdes en distintos puntos y una en el mismo que se pide.
+    def test_una_en_el_punto(self):
+        dataset:DataSetCampanasVerdes = DataSetCampanasVerdes("./dataset_test_files/distancias_distintas.csv")
+        output:tuple[CampanaVerde, CampanaVerde, CampanaVerde] = dataset.tres_campanas_cercanas(0.2,0.2)
+        output_distancias:tuple[float, float, float] = (output[0].distancia(0.2, 0.2), output[1].distancia(0.2, 0.2), output[2].distancia(0.2, 0.2))
+        expected_distancia_cercana:float = 0.0
+        self.assertIn(expected_distancia_cercana, output_distancias)
+        
+####################################################################
+
+# Tests para el método exportar_por_materiales()
+class TestExportarPorMateriales(unittest.TestCase):
+
+    # Exportar por un material que no se puede depositar en ninguna CampanaVerde
+    def test_export_vacio(self):
+        dataset:DataSetCampanasVerdes = DataSetCampanasVerdes("./dataset_test_files/varias_campanas_iguales.csv")
+        dataset.exportar_por_materiales("test", {"Legos"})
+        f = open("test.csv", encoding='UTF-8')
+        output:list[dict[str, str]] = list(csv.DictReader(f, delimiter=";"))
+        f.close()
+        expected_output:list[dict[str, str]] = []
+        self.assertEqual(output, expected_output)
+
+    # Exportar por un material que tengan todas las CampanaVerde
+    def test_todas(self):
+        dataset:DataSetCampanasVerdes = DataSetCampanasVerdes("./dataset_test_files/varias_campanas_iguales.csv")
+        dataset.exportar_por_materiales("test", {"Papel"})
+        f = open("test.csv", encoding='UTF-8')
+        output:list[dict[str, str]] = list(csv.DictReader(f, delimiter=";"))
+        f.close()
+        expected_data:dict[str, str] = {"DIRECCION": "DIR", "BARRIO": "BAR"}
+        expected_output:list[dict[str, str]] = [expected_data, expected_data, expected_data]
+        self.assertEqual(output, expected_output)
 
 unittest.main()

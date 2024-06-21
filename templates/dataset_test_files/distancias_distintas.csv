@@ -1,0 +1,5 @@
+WKT;direccion;barrio;comuna;materiales;mas_info
+POINT (1.5 1.5);DIR;BAR;1;Papel;Los materiales deben estar limpios y secos
+POINT (1.2 1.2);DIR;BAR;1;Papel;Los materiales deben estar limpios y secos
+POINT (1.0 1.0);DIR;BAR;1;Papel;Los materiales deben estar limpios y secos
+POINT (0.2 0.2);DIR;BAR;1;Papel;Los materiales deben estar limpios y secos

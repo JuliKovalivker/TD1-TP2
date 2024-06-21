@@ -34,7 +34,7 @@ class DataSetCampanasVerdes:
         self.campanas_verdes:list[CampanaVerde] = []
         self.cantidad:int = 0
 
-        f = open(archivo_csv, encoding = 'utf8')
+        f = open(archivo_csv, encoding='utf8')
         for c in csv.DictReader(f, delimiter=";"):
             campana:CampanaVerde = CampanaVerde(
                 c["direccion"],

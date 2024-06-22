@@ -1,6 +1,6 @@
 import unittest
 import csv
-from dataset import DataSetCampanasVerdes
+from dataset import *
 from campana_verde import CampanaVerde
 
 ####################################################################
@@ -187,9 +187,19 @@ class TestTresCampanasCercanas(unittest.TestCase):
 class TestExportarPorMateriales(unittest.TestCase):
 
     # Exportar por un material que no se puede depositar en ninguna CampanaVerde
-    def test_export_vacio(self):
+    def test_export_ninguno(self):
         dataset:DataSetCampanasVerdes = DataSetCampanasVerdes("./dataset_test_files/varias_campanas_iguales.csv")
         dataset.exportar_por_materiales("test", {"Legos"})
+        f = open("test.csv", encoding='UTF-8')
+        output:list[dict[str, str]] = list(csv.DictReader(f, delimiter=";"))
+        f.close()
+        expected_output:list[dict[str, str]] = []
+        self.assertEqual(output, expected_output)
+
+    # Exportar por material en un dataset vacio
+    def test_export_vacio(self):
+        dataset:DataSetCampanasVerdes = DataSetCampanasVerdes("./dataset_test_files/empty.csv")
+        dataset.exportar_por_materiales("test", {"Papel"})
         f = open("test.csv", encoding='UTF-8')
         output:list[dict[str, str]] = list(csv.DictReader(f, delimiter=";"))
         f.close()
@@ -205,6 +215,111 @@ class TestExportarPorMateriales(unittest.TestCase):
         f.close()
         expected_data:dict[str, str] = {"DIRECCION": "DIR", "BARRIO": "BAR"}
         expected_output:list[dict[str, str]] = [expected_data, expected_data, expected_data]
+        self.assertEqual(output, expected_output)
+
+    # Exportar por un material que tenga solamente 1 CampanaVerde
+    def test_una_sola(self):
+        dataset:DataSetCampanasVerdes = DataSetCampanasVerdes("./dataset_test_files/varias_campanas_distintas.csv")
+        dataset.exportar_por_materiales("test", {"Ladrillo"})
+        f = open("test.csv", encoding='UTF-8')
+        output:list[dict[str, str]] = list(csv.DictReader(f, delimiter=";"))
+        f.close()
+        expected_output:list[dict[str, str]] = [{"DIRECCION": "DIR", "BARRIO": "BOEDO"}]
+        self.assertEqual(output, expected_output)
+
+####################################################################
+##################### FUNCIONES AUXILIARES #########################
+####################################################################
+
+# Tests para la función WKTaCoordenadas()
+class TestWKTaCoordenadas(unittest.TestCase):
+
+    # Latitud y longitud tienen solamente 1 punto decimal
+    def test_un_decimal(self):
+        output:tuple[float, float] = WKTaCoordenadas("POINT (0.0 0.0)")
+        expected_output:tuple[float, float] = (0.0, 0.0)
+        self.assertEqual(output, expected_output)
+
+    # Latitud y longitud son números negativos
+    def test_negativos(self):
+        output:tuple[float, float] = WKTaCoordenadas("POINT (-5.0 -5.0)")
+        expected_output:tuple[float, float] = (-5.0, -5.0)
+        self.assertEqual(output, expected_output)
+
+    # Uno es negativo y el otro no
+    def test_uno_negativo(self):
+        output:tuple[float, float] = WKTaCoordenadas("POINT (5.0 -5.0)")
+        expected_output:tuple[float, float] = (5.0, -5.0)
+        self.assertEqual(output, expected_output)
+
+    # Latitud y longitud son números distintos
+    def test_distintos(self):
+        output:tuple[float, float] = WKTaCoordenadas("POINT (2.22 1.982)")
+        expected_output:tuple[float, float] = (2.22, 1.982)
+        self.assertEqual(output, expected_output)
+
+####################################################################
+
+# Tests para la función sortTresCampanas()
+class TestSortTresCampanas(unittest.TestCase):
+
+    # Una lista que ya está ordenada
+    def test_ordenada(self):
+        c1:CampanaVerde = CampanaVerde("D1","B", 1, set(), (1.0, 1.0))
+        c2:CampanaVerde = CampanaVerde("D2","B", 1, set(), (2.0, 2.0))
+        c3:CampanaVerde = CampanaVerde("D3","B", 1, set(), (3.0, 3.0))
+        xs:list[CampanaVerde] = [c1, c2, c3]
+        sortTresCampanas(xs, 0.0, 0.0)
+        expected_output:list[CampanaVerde] = [c1, c2, c3]
+        self.assertListEqual(xs, expected_output)
+
+    # Una lista ordenada de mayor a menor
+    def test_mayor_a_menor(self):
+        c3:CampanaVerde = CampanaVerde("D3","B", 1, set(), (3.0, 3.0))
+        c2:CampanaVerde = CampanaVerde("D2","B", 1, set(), (2.0, 2.0))
+        c1:CampanaVerde = CampanaVerde("D1","B", 1, set(), (1.0, 1.0))
+        xs:list[CampanaVerde] = [c3, c2, c1]
+        sortTresCampanas(xs, 0.0, 0.0)
+        expected_output = [c1, c2, c3]
+        self.assertListEqual(xs, expected_output)
+
+    # Una lista en el que el menor está en el medio
+    def test_medio(self):
+        c2:CampanaVerde = CampanaVerde("D2","B", 1, set(), (2.0, 2.0))
+        c1:CampanaVerde = CampanaVerde("D1","B", 1, set(), (1.0, 1.0))
+        c3:CampanaVerde = CampanaVerde("D3","B", 1, set(), (3.0, 3.0))
+        xs:list[CampanaVerde] = [c2, c1, c3]
+        sortTresCampanas(xs, 0.0, 0.0)
+        expected_output:list[CampanaVerde] = [c1, c2, c3]
+        self.assertListEqual(xs, expected_output)
+
+####################################################################
+
+# Tests para la función estaEnSet()
+class TestEstaEnSet(unittest.TestCase):
+
+    # set1 y set2 son iguales
+    def test_iguales(self):
+        set1:set[str] = {"P", "C"}
+        set2:set[str] = {"P", "C"}
+        output:bool = estaEnSet(set1, set2)
+        expected_output:bool = True
+        self.assertEqual(output, expected_output)
+
+    # set1 y set2 están vacíos
+    def test_vacios(self):
+        set1:set[str] = set()
+        set2:set[str] = set()
+        output:bool = estaEnSet(set1, set2)
+        expected_output:bool = True
+        self.assertEqual(output, expected_output)
+
+    # set1 y set2 están vacíos
+    def test_vacios(self):
+        set1:set[str] = set()
+        set2:set[str] = set()
+        output:bool = estaEnSet(set1, set2)
+        expected_output:bool = True
         self.assertEqual(output, expected_output)
 
 unittest.main()

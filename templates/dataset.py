@@ -13,11 +13,12 @@ def sortTresCampanas(xs:list[CampanaVerde], lat: float, lng: float) -> None:
        Devuelve: Nada.
        Modifica: xs de tal manera que ordena las campanas de menor a mayor con respecto a su distancia de la coord ingresada.
     '''
-    for i in range(len(xs)):
-        if xs[i].distancia(lat, lng) < xs[i-1].distancia(lat, lng):
-            (xs[i], xs[i-1]) = (xs[i-1], xs[i])
+    for _ in range(2):
+        for j in range(2):
+            if xs[j].distancia(lat, lng) > xs[j+1].distancia(lat, lng):
+                (xs[j], xs[j+1]) = (xs[j+1], xs[j])
 
-def estaEnSet(set1: set[CampanaVerde], set2: set[CampanaVerde]) -> bool:
+def estaEnSet(set1: set[str], set2: set[str]) -> bool:
     '''Requiere: Nada.
        Devuelve: True si todos los elementos de set1 se encuentran en set2. False si no.
     '''

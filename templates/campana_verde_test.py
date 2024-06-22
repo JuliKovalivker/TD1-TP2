@@ -5,6 +5,7 @@ from haversine import haversine, Unit
 #############################################################################################
 # Tests para el método __init__()
 class TestInit(unittest.TestCase):
+
     # Crear una campana estándar y verificar sus atributos
     def test_crear_campana(self):
         output:CampanaVerde = CampanaVerde("AGUIRRE 1447","CHACARITA", 15, {"PAPEL", "CARTON"}, (-58.4, -34.5))
@@ -23,6 +24,7 @@ class TestInit(unittest.TestCase):
 #############################################################################################
 # Tests para el método distancia()
 class TestDistancia(unittest.TestCase):
+
     # Punto y campana están en la misma coordenada
     def test_distancia_cero(self):
         campana:CampanaVerde = CampanaVerde("","", 1, {"PAPEL"}, (0.0, 0.0))
@@ -50,6 +52,7 @@ class TestDistancia(unittest.TestCase):
 #############################################################################################
 # Tests para el método __repr__()
 class TestRepr(unittest.TestCase):
+
     # Datos de barrio y dirección reales
     def test_campana_real(self):
         campana:CampanaVerde = CampanaVerde("AGUIRRE 1447","CHACARITA", 1, {"PAPEL"}, (0.0, 0.0))
@@ -82,5 +85,31 @@ class TestRepr(unittest.TestCase):
         self.assertTrue((output == possible_output1) or (output == possible_output2), error_message)
 
 #############################################################################################
+# Tests para el método __eq__()
+class TestEq(unittest.TestCase):
+    
+    # Dos instancias de CampanaVerde con los mismos atributos
+    def test_mismos_atributos(self):
+        campana1:CampanaVerde = CampanaVerde("D","B", 1, {"Papel"}, (0.0, 0.0))
+        campana2:CampanaVerde = CampanaVerde("D","B", 1, {"Papel"}, (0.0, 0.0))
+        output:bool = campana1 == campana2
+        expected_output:bool = True
+        self.assertEqual(output, expected_output)
+
+    # Dos instancias de CampanaVerde con todos los atributos distintos
+    def test_distintos_atributos(self):
+        campana1:CampanaVerde = CampanaVerde("D","B", 1, {"Papel"}, (0.0, 0.0))
+        campana2:CampanaVerde = CampanaVerde("D2","B2", 2, {"Cartón"}, (1.0, 1.0))
+        output:bool = campana1 == campana2
+        expected_output:bool = False
+        self.assertEqual(output, expected_output)
+
+    # Dos instancias de CampanaVerde con la mitad de sus atributos iguales
+    def test_algunos_distintos_atributos(self):
+        campana1:CampanaVerde = CampanaVerde("D","B", 2, {"Papel", "Cartón"}, (1.0, 0.0))
+        campana2:CampanaVerde = CampanaVerde("D2","B", 2, {"Cartón"}, (1.0, 1.0))
+        output:bool = campana1 == campana2
+        expected_output:bool = False
+        self.assertEqual(output, expected_output)
 
 unittest.main()

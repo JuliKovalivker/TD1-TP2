@@ -314,10 +314,18 @@ class TestEstaEnSet(unittest.TestCase):
         expected_output:bool = True
         self.assertEqual(output, expected_output)
 
-    # set1 y set2 están vacíos
-    def test_vacios(self):
-        set1:set[str] = set()
-        set2:set[str] = set()
+    # Algunos elementos de set1 no están en set2
+    def test_algunos_no(self):
+        set1:set[str] = {"P", "C"}
+        set2:set[str] = {"P"}
+        output:bool = estaEnSet(set1, set2)
+        expected_output:bool = False
+        self.assertEqual(output, expected_output)
+
+    # set2 tiene más elementos que set1
+    def test_algunos_demas(self):
+        set1:set[str] = {"P", "C"}
+        set2:set[str] = {"P", "C", "J", "A"}
         output:bool = estaEnSet(set1, set2)
         expected_output:bool = True
         self.assertEqual(output, expected_output)

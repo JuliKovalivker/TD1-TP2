@@ -79,7 +79,7 @@ class TestBarrios(unittest.TestCase):
     def test_varios_barrios(self):
         dataset:DataSetCampanasVerdes = DataSetCampanasVerdes("./dataset_test_files/varias_campanas_distintas.csv")
         output:set[str] = dataset.barrios()
-        expected_output: set[str] = {"CHACARITA", "BOEDO", "MONTE CASTRO"}
+        expected_output:set[str] = {"CHACARITA", "BOEDO", "MONTE CASTRO"}
         self.assertSetEqual(output, expected_output)
 
 ####################################################################
